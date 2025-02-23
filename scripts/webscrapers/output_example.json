@@ -1,0 +1,21 @@
+{
+    "equity": {
+        "IE00BK5BQT80": {
+            "name": "FTSE All-World UCITS ETF - (USD) Accumulating",
+            "product_page": "https://www.it.vanguard/professional/prodotti/etf/azionario/9679/ftse-all-world-ucits",
+            "factsheet": "https://fund-docs.vanguard.com/FTSE_All-World_UCITS_ETF_USD_Accumulating_9679_NETH_INT_DU.pdf",
+            "kid": "https://fund-docs.vanguard.com/ie00bk5bqt80_priipskid_nl.pdf",
+            "ter": "0.22%",
+            "currency": "USD",
+            "ticker": "VWCE",
+            "price": "144,12 USD",
+            "date": "21/02/25"
+        }
+    },
+    "bond": {
+        "isin": "href"
+    },
+    "multi_asset": {
+        "isin": "href"
+    }
+}
