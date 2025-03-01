@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 from datetime import date
 
+import requests
 from pythonjsonlogger import jsonlogger
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -30,6 +31,7 @@ class BaseScraper(ABC):
         self.download_folder_path = self._generate_download_folder_path(
             base_download_folder_path, provider_name
         )
+        self.products_json_path = f"{self.download_folder_path}/products.json"
         self.driver, self.wait = self._configure_driver(is_headless)
 
     def _initialize_classwide_logger(
@@ -80,7 +82,7 @@ class BaseScraper(ABC):
 
         return dir_name
 
-    def _rename_latest_downloaded_file(self, new_file_name: str) -> bool:
+    def ___rename_latest_downloaded_file(self, new_file_name: str) -> bool:
         """
         Renames the most recently modified file in the download folder to new_file_name
         """
@@ -120,7 +122,7 @@ class BaseScraper(ABC):
         self.logger.info(f"Opening web page: {url}")
         self.driver.get(url)
 
-    def _click_button_by_xpath(self, xpath: str, btn_name: str = None) -> None:
+    def __click_button_by_xpath(self, xpath: str, btn_name: str = None) -> None:
         """
         Click a button given its xpath
         """
@@ -131,7 +133,7 @@ class BaseScraper(ABC):
         except NoSuchElementException as e:
             self.logger.error(f"No {btn_name} button found: {e}")
 
-    def _get_located_element(self, xpath: str) -> WebElement:
+    def __get_located_element(self, xpath: str) -> WebElement:
         """
         Get an element by its xpath
         """
@@ -149,13 +151,33 @@ class BaseScraper(ABC):
 
         return web_element
 
-    def _save_products_json(self, products: dict) -> None:
+    def __write_products_json(self, products: dict) -> None:
         """
-        Save the products dictionary into a JSON file
+        Write the products dictionary into a JSON file
         """
-        output_file_path = f"{self.download_folder_path}/products.json"
-        with open(output_file_path, "w") as json_file:
+        with open(self.products_json_path, "w") as json_file:
             json.dump(products, json_file, indent=4)
+
+    def __read_products_json(self) -> dict:
+        """
+        Read the previously saved JSON file
+        """
+        with open(self.products_json_path, "r") as file:
+            data = json.load(file)
+            return data
+
+    def __download_file_with_request(self, url: str, file_name: str) -> None:
+        """
+        Download a file from a URL using requests
+        """
+        self.logger.info(f"Downloading file from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            file_path = os.path.join(self.download_folder_path, file_name)
+            with open(file_path, "wb") as file:
+                file.write(response.content)
+        else:
+            self.logger.error(f"Failed to download file: {response.status_code}")
 
     @abstractmethod
     def handle_initial_banners(self) -> None:
