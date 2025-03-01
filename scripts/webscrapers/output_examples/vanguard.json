@@ -1,41 +1,38 @@
 {
-    "equity": {
-        "IE00BK5BQT80": {
-            "name": "Vanguard FTSE All-World UCITS ETF (USD) ACCUMULATING",
-            "ticker": "VWCE IM",
-            "currency": "USD",
-            "ter": "0,22%",
-            "price": "144,12 USD",
-            "date": "21/02/25",
-            "factsheet": "https://fund-docs.vanguard.com/FTSE_All-World_UCITS_ETF_USD_Accumulating_9679_EU_INT_EN.pdf?tipo-di-prodotto=etf",
-            "kid": "https://fund-docs.vanguard.com/ie00bk5bqt80_priipskid_it.pdf?tipo-di-prodotto=etf",
-            "product_page": "https://www.it.vanguard/professional/prodotti/etf/azionario/9679/ftse-all-world-ucits"
-        }
+    "IE00BK5BQT80": {
+        "name": "Vanguard FTSE All-World UCITS ETF (USD) ACCUMULATING",
+        "ticker": "VWCE IM",
+        "fund_type": "equity",
+        "currency": "USD",
+        "ter": "0,22%",
+        "price": "144,12 USD",
+        "date": "21/02/25",
+        "factsheet": "https://fund-docs.vanguard.com/FTSE_All-World_UCITS_ETF_USD_Accumulating_9679_EU_INT_EN.pdf?tipo-di-prodotto=etf",
+        "kid": "https://fund-docs.vanguard.com/ie00bk5bqt80_priipskid_it.pdf?tipo-di-prodotto=etf",
+        "product_page": "https://www.it.vanguard/professional/prodotti/etf/azionario/9679/ftse-all-world-ucits"
     },
-    "bond": {
-        "IE000QADMYA3": {
-            "name": "Vanguard ESG EUR Corporate Bond UCITS ETF (EUR) ACCUMULATING",
-            "ticker": "V3RE IM",
-            "currency": "EUR",
-            "ter": "0,11%",
-            "price": "5,66 \u20ac",
-            "date": "21/02/25",
-            "factsheet": "https://fund-docs.vanguard.com/ESG_EUR_Corporate_Bond_UCITS_ETF_EUR_Accumulating_E043_EU_INT_EN.pdf?tipo-di-prodotto=etf",
-            "kid": "https://fund-docs.vanguard.com/ie000qadmya3_priipskid_it.pdf?tipo-di-prodotto=etf",
-            "product_page": "https://www.it.vanguard/professional/prodotti/etf/obbligazionario/E043/esg-eur-corporate-bond-ucits"
-        }
+    "IE000QADMYA3": {
+        "name": "Vanguard ESG EUR Corporate Bond UCITS ETF (EUR) ACCUMULATING",
+        "ticker": "V3RE IM",
+        "fund_type": "bond",
+        "currency": "EUR",
+        "ter": "0,11%",
+        "price": "5,66 €",
+        "date": "21/02/25",
+        "factsheet": "https://fund-docs.vanguard.com/ESG_EUR_Corporate_Bond_UCITS_ETF_EUR_Accumulating_E043_EU_INT_EN.pdf?tipo-di-prodotto=etf",
+        "kid": "https://fund-docs.vanguard.com/ie000qadmya3_priipskid_it.pdf?tipo-di-prodotto=etf",
+        "product_page": "https://www.it.vanguard/professional/prodotti/etf/obbligazionario/E043/esg-eur-corporate-bond-ucits"
     },
-    "multi_asset": {
-        "IE00BMVB5K07": {
-            "name": "Vanguard LifeStrategy\u00ae 20% Equity UCITS ETF (EUR) ACCUMULATING",
-            "ticker": "VNGA20 IM",
-            "currency": "EUR",
-            "ter": "0,25%",
-            "price": "24,73 \u20ac",
-            "date": "21/02/25",
-            "factsheet": "https://fund-docs.vanguard.com/LifeStrategy_20_Equity_UCITS_ETF_EUR_Accumulating_9490_EU_INT_EN.pdf?tipo-di-prodotto=etf",
-            "kid": "https://fund-docs.vanguard.com/ie00bmvb5k07_priipskid_it.pdf?tipo-di-prodotto=etf",
-            "product_page": "https://www.it.vanguard/professional/prodotti/etf/multi-asset/9490/lifestrategy-20-equity-ucits"
-        }
+    "IE00BMVB5K07": {
+        "name": "Vanguard LifeStrategy® 20% Equity UCITS ETF (EUR) ACCUMULATING",
+        "ticker": "VNGA20 IM",
+        "fund_type": "multi_asset",
+        "currency": "EUR",
+        "ter": "0,25%",
+        "price": "24,73 €",
+        "date": "21/02/25",
+        "factsheet": "https://fund-docs.vanguard.com/LifeStrategy_20_Equity_UCITS_ETF_EUR_Accumulating_9490_EU_INT_EN.pdf?tipo-di-prodotto=etf",
+        "kid": "https://fund-docs.vanguard.com/ie00bmvb5k07_priipskid_it.pdf?tipo-di-prodotto=etf",
+        "product_page": "https://www.it.vanguard/professional/prodotti/etf/multi-asset/9490/lifestrategy-20-equity-ucits"
     }
 }
