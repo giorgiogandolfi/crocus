@@ -31,8 +31,8 @@ class VanguardScraper(BaseScraper):
 
     def get_products_json(self) -> dict:
         """
-        Get Vanguard's products dict
-        The JSON' structure can be seen in the file "./output_example.json"
+        Get Vanguard's products JSON
+        The JSON' structure can be seen in the file "./output_examples/vanguard.json"
         """
         self.logger.info("Cycling through products table")
         table_xpath = """//*[@id="back-to-top"]/europe-core-root/europe-core-app-main/
@@ -45,27 +45,20 @@ class VanguardScraper(BaseScraper):
 
         tbody_element_bond = self._get_located_element(f"{table_xpath}/tbody[4]")
 
-        tbody_element_multi_asset = self._get_located_element(f"{table_xpath}/tbody[6]")
+        tbody_element_multi_asset = self._get_located_element(
+            f"{table_xpath}/tbody[6]"
+        )
 
-        print("found tbody elements")
-
-        def _cycle_trough_tbody(tbody_element: WebElement) -> dict:
+        def _cycle_trough_tbody(tbody_element: WebElement, asset_class: str) -> dict:
             results = {}
             trows = tbody_element.find_elements(By.TAG_NAME, "tr")
 
             for row in trows:
                 # Product name and page
-
                 th = row.find_element(By.XPATH, ".//th")
                 a_element = th.find_element(By.TAG_NAME, "a")
                 name = ("Vanguard " + th.text).replace("\n", " ")
                 product_page = a_element.get_attribute("href")
-
-                print(f"scraping product {name}")
-
-                # th_a_element = row.find_element(By.XPATH, ".//th/a")
-                # name = "Vanguard " + th_a_element.text
-                # product_page = th_a_element.get_attribute("href")
 
                 # Currency
                 currency = row.find_element(By.XPATH, ".//td[1]").text
@@ -80,7 +73,7 @@ class VanguardScraper(BaseScraper):
                 # Ticker
                 ticker = row.find_element(
                     By.XPATH, ".//td[6]"
-                ).text  # @todo bloomberg exchange mapping: https://www.inforeachinc.com/bloomberg-exchange-code-mapping
+                ).text  # TODO: bloomberg exchange mapping: https://www.inforeachinc.com/bloomberg-exchange-code-mapping
                 # Factsheet
                 factsheet = row.find_element(By.XPATH, ".//td[7]/span/a").get_attribute(
                     "href"
@@ -93,6 +86,7 @@ class VanguardScraper(BaseScraper):
                 results[isin] = {
                     "name": name,
                     "ticker": ticker,
+                    "asset_class": asset_class,
                     "currency": currency,
                     "ter": ter,
                     "price": price,
@@ -105,16 +99,21 @@ class VanguardScraper(BaseScraper):
             return results
 
         products_dict = {}
-        products_dict["equity"] = _cycle_trough_tbody(tbody_element_equity)
-        products_dict["bond"] = _cycle_trough_tbody(tbody_element_bond)
-        products_dict["multi_asset"] = _cycle_trough_tbody(tbody_element_multi_asset)
+        equity = _cycle_trough_tbody(tbody_element_equity, "equity")
+        bond = _cycle_trough_tbody(tbody_element_bond, "bond")
+        multi_asset = _cycle_trough_tbody(tbody_element_multi_asset, "multi_asset")
+        products_dict = {
+            **equity,
+            **bond,
+            **multi_asset,
+        }  # unpack dictionaries into one
 
-        self._save_products_json(products_dict)
+        self._write_products_json(products_dict)
 
         return products_dict
 
     def _download_single_product_holdings(
-        self, product_type: str, isin_number: str, product_page: str
+        self, asset_class: str, isin_number: str, product_page: str
     ) -> None:
         """
         Download the holdings file from the single product page
@@ -128,7 +127,7 @@ class VanguardScraper(BaseScraper):
         button_xpath = """//*[@id="back-to-top"]/europe-core-root/europe-core-product-page/
                         aem-page/aem-model-provider/aem-responsivegrid/div/
                         aem-responsivegrid/div[3]/europe-core-jump-links-list/"""
-        match product_type:
+        match asset_class:
             case "equity":
                 button_xpath += """div[17]/europe-core-fund-holdings-container/
                                 europe-core-fund-holdings/div/div/div[1]/div[2]/
@@ -139,27 +138,27 @@ class VanguardScraper(BaseScraper):
                                 europe-core-download-button/button"""
             case "multi_asset":
                 button_xpath += """div[11]/europe-core-basket-details-container/
-                                europe-core-basket-details/div/div/div/div[2]/europe-core-download-button/button"""
+                                europe-core-basket-details/div/div/div/div[2]/
+                                europe-core-download-button/button"""
             case _:
-                self.logger.error(f"Unknown product type: {product_type}")
-                raise ValueError(f"Unknown product type div: {product_type}")
+                self.logger.error(f"Unknown product type: {asset_class}")
+                raise ValueError(f"Unknown product type div: {asset_class}")
 
         download_button = self._get_located_element(button_xpath)
 
         download_button.click()
         sleep(3)  # Wait for the download to finish and not overload the server
 
-        # Rename the file as the ISIN number + format
+        # Rename the file as the ISIN number
         self._rename_latest_downloaded_file(new_file_name=f"{isin_number}")
 
     def download_product_files(self, products_dict: dict) -> None:
-        self._save_products_json(products_dict)
-        for product_type in products_dict.keys():
-            # Cycle trough each product by ISIN
-            for isin in products_dict[product_type].keys():
-                print
-                product_page = products_dict[product_type][isin]["product_page"]
-                self._download_single_product_holdings(product_type, isin, product_page)
+        # Cycle trough each product by ISIN
+        for isin in products_dict.keys():
+            product_page = products_dict[isin]["product_page"]
+            self._download_single_product_holdings(
+                products_dict[isin]["asset_class"], isin, product_page
+            )
 
 
 def main():

@@ -82,7 +82,7 @@ class BaseScraper(ABC):
 
         return dir_name
 
-    def ___rename_latest_downloaded_file(self, new_file_name: str) -> bool:
+    def _rename_latest_downloaded_file(self, new_file_name: str) -> bool:
         """
         Renames the most recently modified file in the download folder to new_file_name
         """
@@ -122,7 +122,7 @@ class BaseScraper(ABC):
         self.logger.info(f"Opening web page: {url}")
         self.driver.get(url)
 
-    def __click_button_by_xpath(self, xpath: str, btn_name: str = None) -> None:
+    def _click_button_by_xpath(self, xpath: str, btn_name: str = None) -> None:
         """
         Click a button given its xpath
         """
@@ -133,7 +133,7 @@ class BaseScraper(ABC):
         except NoSuchElementException as e:
             self.logger.error(f"No {btn_name} button found: {e}")
 
-    def __get_located_element(self, xpath: str) -> WebElement:
+    def _get_located_element(self, xpath: str) -> WebElement:
         """
         Get an element by its xpath
         """
@@ -151,14 +151,14 @@ class BaseScraper(ABC):
 
         return web_element
 
-    def __write_products_json(self, products: dict) -> None:
+    def _write_products_json(self, products: dict) -> None:
         """
         Write the products dictionary into a JSON file
         """
         with open(self.products_json_path, "w") as json_file:
             json.dump(products, json_file, indent=4)
 
-    def __read_products_json(self) -> dict:
+    def _read_products_json(self) -> dict:
         """
         Read the previously saved JSON file
         """
@@ -166,7 +166,7 @@ class BaseScraper(ABC):
             data = json.load(file)
             return data
 
-    def __download_file_with_request(self, url: str, file_name: str) -> None:
+    def _download_file_with_request(self, url: str, file_name: str) -> None:
         """
         Download a file from a URL using requests
         """
