@@ -1,0 +1,26 @@
+{
+    "IE00B5BMR087": {
+        "name": "iShares Core S&P 500 UCITS ETF",
+        "fund_type": null,
+        "currency": "USD",
+        "ter": "0,07",
+        "price": "USD 632,42",
+        "date": "28 feb 2025",
+        "factsheet": "https://www.ishares.com/it/investitore-privato/it/literature/fact-sheet/cspx-ishares-core-s-p-500-ucits-etf-fund-fact-sheet-it-it.pdf",
+        "kid": "https://www.ishares.com/it/investitore-privato/it/literature/kiid/eu-priips-ishares-core-sp-500-ucits-etf-usd-acc-ie00b5bmr087-it.pdf",
+        "product_page": "https://www.ishares.com/it/investitore-privato/it/prodotti/253743/ishares-sp-500-b-ucits-etf-acc-fund",
+        "holdings_file": "https://www.ishares.com/it/investitore-privato/it/prodotti/253743/ishares-sp-500-b-ucits-etf-acc-fund/1506575546154.ajax?fileType=csv&fileName=CSSPX_holdings&dataType=fund"
+    },
+    "IE00B4L5Y983": {
+        "name": "iShares Core MSCI World UCITS ETF",
+        "fund_type": null,
+        "currency": "USD",
+        "ter": "0,20",
+        "price": "USD 110,60",
+        "date": "28 feb 2025",
+        "factsheet": "https://www.ishares.com/it/investitore-privato/it/literature/fact-sheet/swda-ishares-core-msci-world-ucits-etf-fund-fact-sheet-it-it.pdf",
+        "kid": "https://www.ishares.com/it/investitore-privato/it/literature/kiid/eu-priips-ishares-core-msci-world-ucits-etf-ie00b4l5y983-it.pdf",
+        "product_page": "https://www.ishares.com/it/investitore-privato/it/prodotti/251882/ishares-msci-world-ucits-etf-acc-fund",
+        "holdings_file": "https://www.ishares.com/it/investitore-privato/it/prodotti/251882/ishares-msci-world-ucits-etf-acc-fund/1506575546154.ajax?fileType=csv&fileName=SWDA_holdings&dataType=fund"
+    }
+}
