@@ -133,16 +133,27 @@ class BaseScraper(ABC):
         except NoSuchElementException as e:
             self.logger.error(f"No {btn_name} button found: {e}")
 
-    def _get_located_element(self, xpath: str) -> WebElement:
+    def _get_located_element(
+        self, element_id: str, locator: str = "xpath"
+    ) -> WebElement:
         """
-        Get an element by its xpath
+        Get an element by its id
         """
         try:
+            match locator:
+                case "classname":
+                    locator = By.CLASS_NAME
+                case "xpath":
+                    locator = By.XPATH
+                case _:
+                    self.logger.error(f"Locator not implemented: {locator}")
+                    raise ValueError("Locator not implemented")
+
             web_element = self.wait.until(
                 EC.presence_of_element_located(
                     (
-                        By.XPATH,
-                        xpath,
+                        locator,
+                        element_id,
                     )
                 )
             )
