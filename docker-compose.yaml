@@ -1,0 +1,31 @@
+services:
+  selenium:
+    image: selenium/standalone-firefox:135.0-20250303
+    ports:
+      - "4444:4444"
+    expose:
+      - "4444"
+    volumes:
+      - raw-files:/home/seluser/Downloads
+    shm_size: "2g"
+    networks:
+      - my_network
+
+  # vanguard-scraper:
+  #   build: .
+  #   depends_on:
+  #     - selenium
+  #   networks:
+  #     - my_network
+  #   volumes:
+  #     - raw-files:/app/raw-files
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  raw-files:
+    name: raw-files
+
+
