@@ -1,6 +1,6 @@
 from time import sleep
 
-from base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -45,9 +45,7 @@ class VanguardScraper(BaseScraper):
 
         tbody_element_bond = self._get_located_element(f"{table_xpath}/tbody[4]")
 
-        tbody_element_multi_asset = self._get_located_element(
-            f"{table_xpath}/tbody[6]"
-        )
+        tbody_element_multi_asset = self._get_located_element(f"{table_xpath}/tbody[6]")
 
         def _cycle_trough_tbody(tbody_element: WebElement, asset_class: str) -> dict:
             results = {}
@@ -163,11 +161,15 @@ class VanguardScraper(BaseScraper):
 
 def main():
     scraper = VanguardScraper()
-    scraper.open_web_page(ALL_PRODUCTS_PAGE)
-    scraper.handle_initial_banners()
-    products_dict = scraper.get_products_json()
-    scraper.download_product_files(products_dict)
-    scraper.quit()
+    try:
+        scraper.open_web_page(ALL_PRODUCTS_PAGE)
+        scraper.handle_initial_banners()
+        products_dict = scraper.get_products_json()
+        scraper.download_product_files(products_dict)
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        scraper.quit()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from time import sleep
 from urllib.parse import parse_qs, urlparse
 
-from base_scraper import BaseScraper
+from core.base_scraper import BaseScraper
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -189,13 +189,24 @@ class ISharesScraper(BaseScraper):
 
 def main():
     scraper = ISharesScraper()
-    scraper.open_web_page(ALL_PRODUCTS_PAGE)
-    scraper.handle_initial_banners()
-    scraper.view_all_products()
-    products_dict = scraper.get_products_json()
-    # products_dict = scraper._read_products_json()  # test
-    scraper.download_product_files(products_dict)
-    scraper.quit()
+    try:
+        scraper.open_web_page(ALL_PRODUCTS_PAGE)
+        scraper.handle_initial_banners()
+        scraper.view_all_products()
+        products_dict = scraper.get_products_json()
+        # products_dict = scraper._read_products_json()  # test
+        scraper.download_product_files(products_dict)
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        scraper.quit()
+    # scraper.open_web_page(ALL_PRODUCTS_PAGE)
+    # scraper.handle_initial_banners()
+    # print(
+    #     scraper._scrape_single_product_infos(
+    #         "https://www.ishares.com/it/investitore-privato/it/prodotti/333165/ishares-global-high-yield-corp-bond-ucits-etf"
+    #     )
+    # )
 
 
 if __name__ == "__main__":

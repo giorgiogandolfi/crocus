@@ -1,38 +1,45 @@
-import glob
-import json
 import logging
 import os
 from abc import ABC, abstractmethod
 from datetime import date
+from time import sleep
 
-import requests
 from pythonjsonlogger import jsonlogger
-from selenium import webdriver
+
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from .web_drivers import LocalFirefoxDriver, RemoteFirefoxWebDriver
+from .utils import (
+    create_folder,
+    download_file_with_request,
+    read_json,
+    rename_latest_file_in_folder,
+    write_json,
+)
 
 
 class BaseScraper(ABC):
     def __init__(
         self,
         provider_name: str,
-        base_download_folder_path: str = None,
-        is_headless: bool = False,
+        base_path: str = "/app/raw-files",
+        # base_path: str = "/Users/giorgiogandolfi/development/etfs_downloads",
     ):
-        if not base_download_folder_path:
-            base_download_folder_path = (
-                "/Users/giorgiogandolfi/development/etfs_downloads"
-            )
-
         self.logger = self._initialize_classwide_logger()
-        self.download_folder_path = self._generate_download_folder_path(
-            base_download_folder_path, provider_name
-        )
-        self.products_json_path = f"{self.download_folder_path}/products.json"
-        self.driver, self.wait = self._configure_driver(is_headless)
+        # There will be two download folders:
+        # the first one will be the one where the selenium browser downloads the files;
+        # the second one will be basd also on today's date and the provider name.
+        # Generate the download folder path, create the folder if id doesn't exist
+        self.base_path = base_path
+        self.full_path = self._generate_full_path(self.base_path, provider_name)
+        # self.full_path = base_path
+        self.products_file = os.path.join(self.full_path, "products.json")
+        webdriver = RemoteFirefoxWebDriver(self.full_path)
+        self.driver = webdriver.get_driver()
+        self.driver.set_window_size(1920, 1080)
+        self.wait = webdriver.get_wait()
 
     def _initialize_classwide_logger(
         self,
@@ -50,26 +57,7 @@ class BaseScraper(ABC):
 
         return logger
 
-    def _configure_driver(
-        self,
-        headless: bool = False,
-    ) -> tuple[webdriver.Chrome, WebDriverWait]:
-        """
-        Configure the selenium WebDriver
-        """
-        self.logger.info("Configuring the WebDriver")
-        options = webdriver.ChromeOptions()
-        if headless:
-            options.add_argument("--headless")
-        if self.download_folder_path:
-            prefs = {"download.default_directory": self.download_folder_path}
-            options.add_experimental_option("prefs", prefs)
-        driver = webdriver.Chrome(options=options)
-        wait = WebDriverWait(driver, 20)
-
-        return driver, wait
-
-    def _generate_download_folder_path(self, base_path: str, provider_name: str) -> str:
+    def _generate_full_path(self, base_path: str, provider_name: str) -> str:
         """
         Esures that the download folder path exists or else creates it
         The folder path returned will be like:
@@ -77,36 +65,18 @@ class BaseScraper(ABC):
         """
         today = date.today().strftime("%Y-%m-%d")
         dir_name = os.path.join(base_path, today, provider_name)
-        if not os.path.exists(dir_name):
-            os.makedirs(dir_name, exist_ok=True)
+        create_folder(dir_name)
 
         return dir_name
 
     def _rename_latest_downloaded_file(self, new_file_name: str) -> bool:
         """
-        Renames the most recently modified file in the download folder to new_file_name
+        Search for the most recently created or modified file in the base folder
+        Rename the file and change its location to the full_path
         """
-        files = glob.glob(os.path.join(self.download_folder_path, "*"))
-
-        if not files:
-            self.logger.error("No files found in the download folder")
-            return False
-
-        # Find latest and new files
-        latest_file = max(files, key=os.path.getmtime)
-        file_extension = latest_file.split(".")[-1]
-        new_file_name = ".".join([new_file_name, file_extension])
-
-        # Create the full path for the new file
-        new_file_path = os.path.join(self.download_folder_path, new_file_name)
-
-        try:
-            self.logger.info(f"Renaming file {latest_file} to: {new_file_path}")
-            os.rename(latest_file, new_file_path)
-            return True
-        except Exception as e:
-            self.logger.error(f"Error renaming file {latest_file}: {e}")
-            return False
+        return rename_latest_file_in_folder(
+            self.base_path, self.full_path, new_file_name
+        )
 
     def quit(self) -> None:
         """
@@ -129,7 +99,9 @@ class BaseScraper(ABC):
         self.logger.info(f"Clicking the {btn_name} button")
         try:
             button = self.wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            sleep(1)
             button.click()
+            sleep(1)
         except NoSuchElementException as e:
             self.logger.error(f"No {btn_name} button found: {e}")
 
@@ -143,6 +115,8 @@ class BaseScraper(ABC):
             match locator:
                 case "classname":
                     locator = By.CLASS_NAME
+                case "selector":
+                    locator = By.CSS_SELECTOR
                 case "xpath":
                     locator = By.XPATH
                 case _:
@@ -166,29 +140,20 @@ class BaseScraper(ABC):
         """
         Write the products dictionary into a JSON file
         """
-        with open(self.products_json_path, "w") as json_file:
-            json.dump(products, json_file, indent=4)
+        write_json(self.products_file, products)
 
     def _read_products_json(self) -> dict:
         """
         Read the previously saved JSON file
         """
-        with open(self.products_json_path, "r") as file:
-            data = json.load(file)
-            return data
+        return read_json(self.products_file)
 
     def _download_file_with_request(self, url: str, file_name: str) -> None:
         """
         Download a file from a URL using requests
         """
         self.logger.info(f"Downloading file from {url}")
-        response = requests.get(url)
-        if response.status_code == 200:
-            file_path = os.path.join(self.download_folder_path, file_name)
-            with open(file_path, "wb") as file:
-                file.write(response.content)
-        else:
-            self.logger.error(f"Failed to download file: {response.status_code}")
+        download_file_with_request(url, self.full_path, file_name)
 
     @abstractmethod
     def handle_initial_banners(self) -> None:
