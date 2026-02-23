@@ -3,13 +3,49 @@ services:
     image: selenium/standalone-firefox:135.0-20250303
     ports:
       - "4444:4444"
-    expose:
-      - "4444"
+    # expose:
+    #   - "4444"
     volumes:
       - raw-files:/home/seluser/Downloads
     shm_size: "2g"
     networks:
       - my_network
+
+  # RustFS main service
+  rustfs:
+    image: rustfs/rustfs:1.0.0-alpha.83
+    container_name: rustfs-server
+    ports:
+      - "9000:9000" # S3 API port
+      - "9001:9001" # Console port
+    environment:
+      - RUSTFS_VOLUMES=/data/rustfs0
+      - RUSTFS_ADDRESS=0.0.0.0:9000
+      - RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001
+      - RUSTFS_CONSOLE_ENABLE=true
+      - RUSTFS_ACCESS_KEY=ROOTNAME # CHANGEME
+      - RUSTFS_SECRET_KEY=CHANGEME123 # CHANGEME
+      - RUSTFS_OBS_LOGGER_LEVEL=info
+    volumes:
+      - rustfs_data_0:/data/rustfs0
+    networks:
+      - my_network
+    depends_on:
+      volume-permission-helper:
+        condition: service_completed_successfully
+
+  # RustFS volume permissions fixer service
+  volume-permission-helper:
+    image: alpine
+    volumes:
+      - rustfs_data_0:/data0
+    command: >
+      sh -c "
+        chown -R 10001:10001 /data0 &&
+        echo 'Volume Permissions fixed' &&
+        exit 0
+      "
+    restart: "no"
 
   # vanguard-scraper:
   #   build: .
@@ -27,5 +63,5 @@ networks:
 volumes:
   raw-files:
     name: raw-files
-
-
+  rustfs_data_0:
+    name: rustfs-data-0
